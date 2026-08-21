@@ -62,6 +62,7 @@ class ModuleMain : XposedModule() {
             installNativeProviderEntryHook(cl)
             installProviderCatalogHook(cl)
             installCustomModelFormHook(cl)
+            ModuleExt.onPackageReady(this, cl)
         } catch (t: Throwable) {
             log(Log.ERROR, TAG, "hook failed", t)
         }
@@ -679,7 +680,7 @@ class ModuleMain : XposedModule() {
         }
 
     // ---------- 反射辅助 ----------
-    private fun findMethod(clazz: Class<*>, name: String, paramTypes: Array<Class<*>>): Method? {
+    internal fun findMethod(clazz: Class<*>, name: String, paramTypes: Array<Class<*>>): Method? {
         for (m in clazz.declaredMethods) {
             if (m.name != name) continue
             if (m.parameterTypes.contentEquals(paramTypes)) {
@@ -690,7 +691,7 @@ class ModuleMain : XposedModule() {
         return null
     }
 
-    private fun findConstructor(clazz: Class<*>, paramTypes: Array<Class<*>>): Constructor<*>? {
+    internal fun findConstructor(clazz: Class<*>, paramTypes: Array<Class<*>>): Constructor<*>? {
         for (c in clazz.declaredConstructors) {
             if (c.parameterTypes.contentEquals(paramTypes)) {
                 c.isAccessible = true
