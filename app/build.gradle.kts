@@ -20,6 +20,9 @@ android {
     buildTypes {
         release {
             isMinifyEnabled = true
+            // CI 自动化构建用 debug keystore 自动签名，便于直接安装；
+            // 正式发布可替换为自有签名配置。
+            signingConfig = signingConfigs.getByName("debug")
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
         }
     }
