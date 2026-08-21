@@ -221,7 +221,7 @@ object NextPassConfigStore {
     } catch (_: Throwable) { emptyList() }
 
     internal fun serialized(): String {
-        val file = listOf(File(SDCARD_FILE), File(MODULE_FILE))
+        val file = listOf(File(SDCARD_FILE), File(LEGACY_SDCARD_FILE), File(MODULE_FILE))
             .firstNotNullOfOrNull { f -> f.takeIf { it.canRead() && it.length() > 0 } }
         return file?.let { runCatching { it.readText() }.getOrNull() } ?: "[]"
     }
