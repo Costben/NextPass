@@ -1,4 +1,4 @@
-package com.craftool.ui
+package com.nextpass
 
 import android.app.Activity
 import android.app.Application
@@ -18,9 +18,9 @@ import org.json.JSONArray
 import org.json.JSONObject
 
 /**
- * CraftUi — com.oplus.claw 注入式 Hook 模块。
+ * NextPass — com.oplus.claw 注入式 Hook 模块。
  *
- * CraftUi 自身是普通可打开的设置应用；本类只在目标进程中安装 hooks，
+ * NextPass 自身是普通可打开的设置应用；本类只在目标进程中安装 hooks，
  * 不负责隐藏或结束任何 UI。
  *
  *  1. cleartext 放行：支持 http:// 明文地址（本地 New API 场景）.
@@ -32,7 +32,7 @@ import org.json.JSONObject
 class ModuleMain : XposedModule() {
 
     companion object {
-        private const val TAG = "CraftUi"
+        private const val TAG = "NextPass"
         private const val TARGET_PACKAGE = "com.oplus.claw"
 
         // 混淆后的关键类（编译期不可见，运行时用 ClassLoader 加载）
@@ -126,7 +126,7 @@ class ModuleMain : XposedModule() {
         targetContext = context.applicationContext
         val configs = NextPassConfigStore.load(context)
         if (configs.isEmpty() && !NextPassConfigStore.isAvailable(context)) {
-            // CraftUi may still be starting. Leave this false so the resume
+            // NextPass may still be starting. Leave this false so the resume
             // hook retries instead of freezing an empty snapshot for the life
             // of the Cloud process.
             log(Log.INFO, TAG, "config bridge not ready; will retry")
@@ -136,7 +136,7 @@ class ModuleMain : XposedModule() {
         log(Log.INFO, TAG, "config: ${configs.size} providers (enabled=${enabled.map { it.providerId }})")
         try {
             // Always reconcile the target model preference, including the empty
-            // case. This removes legacy CraftUi entries after the last custom
+            // case. This removes legacy NextPass entries after the last custom
             // provider is deleted.
             syncTargetStores(context, cl, enabled)
             if (enabled.isNotEmpty()) {
@@ -144,7 +144,7 @@ class ModuleMain : XposedModule() {
                 installApiKeyHook(cl, enabled)
             }
             targetConfigured = true
-            log(Log.INFO, TAG, "CraftUi hooks installed")
+            log(Log.INFO, TAG, "NextPass hooks installed")
         } catch (t: Throwable) {
             log(Log.ERROR, TAG, "configured hook failed", t)
         }
@@ -156,12 +156,12 @@ class ModuleMain : XposedModule() {
             .invoke(null) as? Application
     } catch (_: Throwable) { null }
 
-    /** Make CraftUi entries visible to Cloud's own provider/model settings UI. */
+    /** Make NextPass entries visible to Cloud's own provider/model settings UI. */
     private fun syncTargetStores(context: Context, cl: ClassLoader, configs: List<ProviderConfig>) {
         try {
             val prefs = context.getSharedPreferences("mobileclaw_settings_ui", Context.MODE_PRIVATE)
             // This preference is the bridge's model catalogue. Reconcile it
-            // from the single normalized CraftUi source on every Cloud start
+            // from the single normalized NextPass source on every Cloud start
             // so entries from older versions cannot accumulate or duplicate.
             val merged = JSONArray()
             val seenKeys = mutableSetOf<String>()
@@ -170,7 +170,7 @@ class ModuleMain : XposedModule() {
                     val modelKey = "${config.providerId}/$modelId"
                     if (!seenKeys.add(modelKey)) continue
                     val entry = JSONObject()
-                        .put("entryId", "craftui-${config.providerId}-${modelId.hashCode().toUInt().toString(16)}")
+                        .put("entryId", "nextpass-${config.providerId}-${modelId.hashCode().toUInt().toString(16)}")
                         .put("displayName", modelId)
                         .put("providerId", config.providerId)
                         .put("modelId", modelId)
@@ -207,7 +207,7 @@ class ModuleMain : XposedModule() {
      * The custom-model form reads its provider dropdown from p5.b(). The
      * backing list is an immutable Kotlin list, so mutating p5.a crashes
      * with UnsupportedOperationException. Hook the accessors instead and
-     * return a mutable copy containing the current CraftUi providers.
+     * return a mutable copy containing the current NextPass providers.
      */
     private fun installProviderCatalogHook(cl: ClassLoader) {
         if (providerCatalogHookInstalled) return
@@ -281,7 +281,7 @@ class ModuleMain : XposedModule() {
     /**
      * Cloud's custom-model list intentionally persists only provider/model IDs;
      * its editor then creates an empty m5 state and leaves Base URL/API Key blank.
-     * Supply those two fields from CraftUi whenever the editor renders or saves.
+     * Supply those two fields from NextPass whenever the editor renders or saves.
      */
     private fun installCustomModelFormHook(cl: ClassLoader) {
         try {
@@ -322,7 +322,7 @@ class ModuleMain : XposedModule() {
             }
 
             // Cloud's own delete button removes only its local catalogue.
-            // Mirror that deletion into CraftUi so the next reconciliation
+            // Mirror that deletion into NextPass so the next reconciliation
             // does not silently add the model back.
             val deleteMethod = settings.getDeclaredMethod(
                 "C1", Context::class.java, String::class.java, String::class.java,
@@ -333,7 +333,7 @@ class ModuleMain : XposedModule() {
                 val providerId = chain.getArg(2) as? String
                 val modelId = chain.getArg(3) as? String
                 if (!providerId.isNullOrBlank() && !modelId.isNullOrBlank()) {
-                    removeCraftUiModel(providerId, modelId)
+                    removeNextPassModel(providerId, modelId)
                 }
                 result
             }
@@ -343,7 +343,7 @@ class ModuleMain : XposedModule() {
         }
     }
 
-    private fun removeCraftUiModel(providerId: String, modelId: String) {
+    private fun removeNextPassModel(providerId: String, modelId: String) {
         val context = targetContext ?: targetApplication() ?: return
         val updated = NextPassConfigStore.load(context).map { cfg ->
             if (cfg.providerId == providerId) {
@@ -354,11 +354,11 @@ class ModuleMain : XposedModule() {
             putString("json", JSONArray().apply { updated.forEach { put(it.toJson()) } }.toString())
         }
         val bridged = runCatching {
-            context.contentResolver.call(Uri.parse("content://com.craftool.ui.config"), "write_config", null, payload)
+            context.contentResolver.call(Uri.parse("content://com.nextpass.config"), "write_config", null, payload)
                 ?.getBoolean("ok", false) == true
         }.getOrDefault(false)
         if (!bridged) NextPassConfigStore.save(updated)
-        log(Log.INFO, TAG, "removed CraftUi model $providerId/$modelId")
+        log(Log.INFO, TAG, "removed NextPass model $providerId/$modelId")
     }
 
     private fun enrichCustomFormState(cl: ClassLoader, state: Any?): Any? {
@@ -562,12 +562,12 @@ class ModuleMain : XposedModule() {
 
     private fun launchProviderConfig(activity: Activity) {
         try {
-            val intent = Intent().setClassName("com.craftool.ui", "com.craftool.ui.MainActivity")
+            val intent = Intent().setClassName("com.nextpass", "com.nextpass.MainActivity")
                 .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP)
             activity.startActivity(intent)
-            log(Log.INFO, TAG, "CraftUi provider row -> MainActivity")
+            log(Log.INFO, TAG, "NextPass provider row -> MainActivity")
         } catch (t: Throwable) {
-            log(Log.WARN, TAG, "launch CraftUi MainActivity failed: $t")
+            log(Log.WARN, TAG, "launch NextPass MainActivity failed: $t")
         }
     }
 

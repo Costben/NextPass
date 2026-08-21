@@ -3,11 +3,13 @@
 
     <uses-permission android:name="android.permission.INTERNET" />
 
-    <!-- CraftUi is both a normal settings app and an LSPosed module for
+    <!-- NextPass is both a normal settings app and an LSPosed module for
          com.oplus.claw. The launcher activity is intentionally ordinary: no
          secure flag, no transparency, no noHistory, and no auto-hide path. -->
     <application
-        android:label="CraftUi"
+        android:label="NextPass"
+        android:icon="@mipmap/ic_launcher"
+        android:roundIcon="@mipmap/ic_launcher_round"
         android:allowBackup="false"
         android:hasCode="true"
         android:usesCleartextTraffic="true"
@@ -26,7 +28,7 @@
         <!-- Cross-UID read bridge used only by the injected com.oplus.claw process. -->
         <provider
             android:name=".ConfigContentProvider"
-            android:authorities="com.craftool.ui.config"
+            android:authorities="com.nextpass.config"
             android:exported="true"
             android:grantUriPermissions="false" />
 

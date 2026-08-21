@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:aapt="http://schemas.android.com/aapt"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+
+    <!-- Left Pillar of N -->
+    <path
+        android:pathData="M35,32 L35,76"
+        android:strokeWidth="7"
+        android:strokeLineCap="round">
+        <aapt:attr name="android:strokeColor">
+            <gradient
+                android:startX="35"
+                android:startY="32"
+                android:endX="35"
+                android:endY="76"
+                android:type="linear">
+                <item android:offset="0.0" android:color="#FF00F0FF" />
+                <item android:offset="1.0" android:color="#FF1E90FF" />
+            </gradient>
+        </aapt:attr>
+    </path>
+
+    <!-- Diagonal of N -->
+    <path
+        android:pathData="M35,32 L73,76"
+        android:strokeWidth="7"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round">
+        <aapt:attr name="android:strokeColor">
+            <gradient
+                android:startX="35"
+                android:startY="32"
+                android:endX="73"
+                android:endY="76"
+                android:type="linear">
+                <item android:offset="0.0" android:color="#FF00E5FF" />
+                <item android:offset="0.5" android:color="#FF8B5CF6" />
+                <item android:offset="1.0" android:color="#FFEC4899" />
+            </gradient>
+        </aapt:attr>
+    </path>
+
+    <!-- Right Pillar of N -->
+    <path
+        android:pathData="M73,32 L73,76"
+        android:strokeWidth="7"
+        android:strokeLineCap="round">
+        <aapt:attr name="android:strokeColor">
+            <gradient
+                android:startX="73"
+                android:startY="32"
+                android:endX="73"
+                android:endY="76"
+                android:type="linear">
+                <item android:offset="0.0" android:color="#FFA855F7" />
+                <item android:offset="1.0" android:color="#FFEC4899" />
+            </gradient>
+        </aapt:attr>
+    </path>
+
+    <!-- Fast Pass / Forward Chevron in glowing cyan-white -->
+    <path
+        android:pathData="M59,41 L67,49 L59,57"
+        android:strokeWidth="3.5"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round"
+        android:strokeColor="#FFFFFFFF" />
+    <path
+        android:pathData="M65,41 L73,49 L65,57"
+        android:strokeWidth="3.5"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round"
+        android:strokeColor="#FF00F0FF" />
+</vector>

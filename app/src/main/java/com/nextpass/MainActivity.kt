@@ -1,4 +1,4 @@
-package com.craftool.ui
+package com.nextpass
 
 import android.app.Activity
 import android.os.Build
@@ -26,7 +26,7 @@ import java.net.HttpURLConnection
 import java.net.URL
 
 /**
- * CraftUi 的正常应用主界面。
+ * NextPass 的正常应用主界面。
  *
  * 这是唯一的桌面入口，配置直接保存在共享配置文件中，供目标进程里的
  * Xposed hooks 读取。它不设置安全窗口、透明窗口或自动结束行为。
@@ -69,7 +69,7 @@ class MainActivity : Activity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        title = "服务商配置"
+        title = "NextPass"
         val loaded = NextPassConfigStore.load()
         currentConfigs = ProviderConfig.normalize(loaded)
         // Rewrite legacy timestamp-based entries once so old duplicates disappear

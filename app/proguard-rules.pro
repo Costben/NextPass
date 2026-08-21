@@ -7,4 +7,4 @@
 }
 
 # Launcher activity is referenced by the manifest and by the provider-row hook.
--keep public class com.craftool.ui.MainActivity { *; }
+-keep public class com.nextpass.MainActivity { *; }

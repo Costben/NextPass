@@ -11,5 +11,5 @@ dependencyResolutionManagement {
         mavenCentral()
     }
 }
-rootProject.name = "lsposed_xiaobu"
+rootProject.name = "NextPass"
 include(":app")

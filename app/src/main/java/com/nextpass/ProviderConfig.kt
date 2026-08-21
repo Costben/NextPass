@@ -1,4 +1,4 @@
-package com.craftool.ui
+package com.nextpass
 
 import android.content.Context
 import android.net.Uri
@@ -158,17 +158,18 @@ data class ProviderConfig(
 
 object NextPassConfigStore {
     /**
-     * 配置持久化（配置 UI 运行在 CraftUi 进程，而 hook 运行在
+     * 配置持久化（配置 UI 运行在 NextPass 进程，而 hook 运行在
      * com.oplus.claw 进程，两个 uid 必须都能读写同一个文件）。
      *
      * 因此 **不写** claw 私有目录（模块进程无权写、还会闪退），改存共享位置：
      *  - 首选：/sdcard/NextPass/nextpass.json（两部进程都能读写，root 预创建 666）
-     *  - 回退：模块自身私有目录 /data/data/com.craftool.ui/files/（只有 UI 进程，重启后仍保留）
+     *  - 回退：模块自身私有目录 /data/data/com.nextpass/files/（只有 UI 进程，重启后仍保留）
      */
-    const val SDCARD_FILE = "/sdcard/CraftUi/nextpass.json"
-    const val MODULE_FILE = "/data/data/com.craftool.ui/files/nextpass.json"
+    const val SDCARD_FILE = "/sdcard/NextPass/nextpass.json"
+    const val LEGACY_SDCARD_FILE = "/sdcard/CraftUi/nextpass.json"
+    const val MODULE_FILE = "/data/data/com.nextpass/files/nextpass.json"
     const val TARGET_FILE = "/data/data/com.oplus.claw/files/nextpass.json"
-    private const val BRIDGE_URI = "content://com.craftool.ui.config"
+    private const val BRIDGE_URI = "content://com.nextpass.config"
 
     /** Load from the normal app file, or from the exported bridge when called in Cloud. */
     fun load(context: Context? = null): List<ProviderConfig> {
@@ -177,21 +178,21 @@ object NextPassConfigStore {
                 context.contentResolver.call(Uri.parse(BRIDGE_URI), "read_config", null, null)
                     ?.getString("json")
             } catch (t: Throwable) {
-                Log.w("CraftUi", "config bridge failed", t)
+                Log.w("NextPass", "config bridge failed", t)
                 null
             }
             if (bridged != null) {
                 val parsed = ProviderConfig.normalize(parse(bridged))
-                Log.i("CraftUi", "config bridge returned ${parsed.size} providers")
+                Log.i("NextPass", "config bridge returned ${parsed.size} providers")
                 if (parsed.isNotEmpty() || bridged.trim() == "[]") return parsed
             } else {
-                Log.w("CraftUi", "config bridge unavailable for ${context.packageName}")
+                Log.w("NextPass", "config bridge unavailable for ${context.packageName}")
             }
         }
         val files = if (context?.packageName == "com.oplus.claw") {
-            listOf(File(TARGET_FILE), File(SDCARD_FILE), File(MODULE_FILE))
+            listOf(File(TARGET_FILE), File(SDCARD_FILE), File(LEGACY_SDCARD_FILE), File(MODULE_FILE))
         } else {
-            listOf(File(SDCARD_FILE), File(MODULE_FILE))
+            listOf(File(SDCARD_FILE), File(LEGACY_SDCARD_FILE), File(MODULE_FILE))
         }
         val text = files.firstNotNullOfOrNull { f ->
             f.takeIf { it.canRead() && it.length() > 0 }?.let { runCatching { it.readText() }.getOrNull() }
@@ -207,9 +208,9 @@ object NextPassConfigStore {
         }.getOrNull()
         if (bridged != null) return true
         val files = if (context.packageName == "com.oplus.claw") {
-            listOf(File(TARGET_FILE), File(SDCARD_FILE), File(MODULE_FILE))
+            listOf(File(TARGET_FILE), File(SDCARD_FILE), File(LEGACY_SDCARD_FILE), File(MODULE_FILE))
         } else {
-            listOf(File(SDCARD_FILE), File(MODULE_FILE))
+            listOf(File(SDCARD_FILE), File(LEGACY_SDCARD_FILE), File(MODULE_FILE))
         }
         return files.any { it.canRead() && it.length() > 0 }
     }

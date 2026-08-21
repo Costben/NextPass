@@ -1,4 +1,4 @@
-package com.craftool.ui
+package com.nextpass
 
 import android.content.ContentProvider
 import android.content.ContentValues
@@ -9,14 +9,14 @@ import android.util.Log
 
 /**
  * Small configuration bridge for the LSPosed-injected Cloud process. The two
- * apps have different UIDs, so Cloud cannot read or update CraftUi's private
+ * apps have different UIDs, so Cloud cannot read or update NextPass's private
  * files directly.
  */
 class ConfigContentProvider : ContentProvider() {
     override fun onCreate(): Boolean = true
 
     override fun call(method: String, arg: String?, extras: Bundle?): Bundle? {
-        Log.i("CraftUi", "config provider $method from ${callingPackage ?: "unknown"}")
+        Log.i("NextPass", "config provider $method from ${callingPackage ?: "unknown"}")
         return when (method) {
             "read_config" -> Bundle().apply { putString("json", NextPassConfigStore.serialized()) }
             "write_config" -> {

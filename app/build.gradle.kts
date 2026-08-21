@@ -6,11 +6,11 @@ plugins {
 }
 
 android {
-    namespace = "com.craftool.ui"
+    namespace = "com.nextpass"
     compileSdk = 35
 
     defaultConfig {
-        applicationId = "com.craftool.ui"
+        applicationId = "com.nextpass"
         minSdk = 29
         targetSdk = 35
         versionCode = 2
