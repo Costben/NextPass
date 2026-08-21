@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <uses-permission android:name="android.permission.INTERNET" />
+
+    <!-- CraftUi is both a normal settings app and an LSPosed module for
+         com.oplus.claw. The launcher activity is intentionally ordinary: no
+         secure flag, no transparency, no noHistory, and no auto-hide path. -->
+    <application
+        android:label="CraftUi"
+        android:allowBackup="false"
+        android:hasCode="true"
+        android:usesCleartextTraffic="true"
+        android:theme="@android:style/Theme.DeviceDefault.NoActionBar">
+
+        <activity
+            android:name=".MainActivity"
+            android:exported="true">
+            <!-- 唯一桌面入口：按普通应用方式打开设置 -->
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
+        <!-- Cross-UID read bridge used only by the injected com.oplus.claw process. -->
+        <provider
+            android:name=".ConfigContentProvider"
+            android:authorities="com.craftool.ui.config"
+            android:exported="true"
+            android:grantUriPermissions="false" />
+
+    </application>
+</manifest>
