@@ -3,18 +3,20 @@ import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
+    id("org.jetbrains.kotlin.plugin.compose")
+    id("org.jetbrains.compose")
 }
 
 android {
     namespace = "com.nextpass"
-    compileSdk = 35
+    compileSdk = 36
 
     defaultConfig {
         applicationId = "com.nextpass"
         minSdk = 29
         targetSdk = 35
-        versionCode = 2
-        versionName = "1.0.1"
+        versionCode = 3
+        versionName = "1.1.0"
     }
 
     buildTypes {
@@ -44,6 +46,11 @@ android {
 }
 
 dependencies {
+    implementation("top.yukonga.miuix.kmp:miuix-android:0.8.8")
+    implementation(compose.runtime)
+    implementation(compose.foundation)
+    implementation(compose.ui)
+    implementation("androidx.activity:activity-compose:1.13.0")
     compileOnly("io.github.libxposed:api:102.0.0")
     compileOnly("androidx.annotation:annotation:1.8.2")
 }
